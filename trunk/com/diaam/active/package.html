@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+ // $Log: package.html,v $
+ // Revision 1.2  2005/07/19 07:04:45  herve
+ // Commit pour passage à SVN.
+ //
+ // Revision 1.1.1.1  2005/05/10 13:14:00  herve
+ // activons nous, mais en reflechissant
+ //
+ //
+ //
+-->
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-15">
+	<TITLE></TITLE>
+</HEAD>
+<BODY>
+<p>Active, le Java-Bean des applications.</p>
+
+@author <a href="mailto:herve.agnoux@diaam-informatique.com">Hervé AGNOUX</a>
+
+<div>
+<p>Ce projet a pour objectif de fournir des outils logiciels pour explorer et
+identifier les applications en cours d'exécution.</p>
+<p>Il s'agit de répondre aux question suivantes, 
+pour une application en cours d'éxecution :
+<ul>
+<li>Quelle est cette application ?</li>
+<li>Que fait-elle ?</li>
+<li>Comment est-elle construite, de quels modèles se sert-elle ?</li>
+<li>Peut-on lui faire confiance ?</li>
+</ul>
+<p>Chaque question a aussi sa forme auto-interrogative :
+<ul>
+<li>Qui suis-je  ?</li>
+<li>Que fais-je ?</li>
+<li>Comment suis-je construit, de quels modèles me sers-je ?</li>
+<li>Puis-je compter sur moi ?</li>
+</ul>
+</p>
+<p>Il s'agit de faire la même chose pour les applications que ce que font
+les paquetages java.beans et java.lang.reflect pour les objets.</p>
+<p>Pour commencer, 3 paquetages seront inclus ; voici leur nom et
+leurs rôles.
+<dl>
+<dt>thisis</dt>
+<dd>Tout ce qui concerne l'identification d'une application. Dans
+l'immédiat, il y aura seulement une tentative pour identifier la version.</dd>
+<dt>templates</dt>
+<dd>Tout ce qui concerne l'identification et la mise en oeuvre
+des templates utilisés. Pour l'instant, seul les modèles getter et
+setter des beans et le modèle du visiteur existent (et encore ! )
+<dt>runs</dt>
+<dd>Tout ce qui concerne ce que fait l'application. Pour l'instant
+seul un log un peu plus évolué que log4j existe.
+</dd>
+</dl>
+</p>
+<p>Qu'est ce qu'une <b>application</b> ? Est-ce une applet, une servlet, un
+service, une webapp ?</p>
+<p>Il n'est pas sûr qu'il faille répondre précisément à cette question.
+Après tout, le paquetage JavaBeans ne définit pas ce qu'est un objet. De
+toutes façons, ce sera le paquetage <i>thisis</i> (<i>this is</i>) qui y
+répondra. Pour se donner un modèle, on reprendra celui de l'acteur. Une 
+application est un acteur, un actif, quelque chose qui tourne autour
+de cette notion ; d'où le nom du projet : <i>Active</i>.</p>
+<p>Il pourra y avoir des services à destination de l'utilisateur final réalisés
+dans le cadre de ce projet. Par exemple, une boîte <i>A propos</i> minima ; 
+ou une évaluation de la confiance accordable à
+l'application. Il pourra également y avoir des aides à destination des
+développeurs, un peu comme, dans les envirronements de développement 
+graphiques, on trouve des boîtes de dialogue pour remplir les propriétés des
+beans.</p>
+
+</div>
+</BODY>
+</HTML>
