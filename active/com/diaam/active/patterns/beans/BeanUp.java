@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.Map;
 
 
 
@@ -40,22 +41,34 @@ import java.util.HashMap;
  */
 public class BeanUp implements java.lang.reflect.InvocationHandler
 {
+  /**
+   * A class which the properties can be seen by a Map. It's the case of the
+   * BeanUp. So if the contract give to the <i>getInstance</i> methods
+   * implements or extends this interface, you can get the internaly Map,
+   * and use it to influence the comportment of the bean.
+   *
+   */
+  public interface Mapable
+  {
+    public Map getValues();
+  }
+  
   private HashMap m_values;
   private Class m_contract;
   private PropertyDescriptor[] am_properties;
   
-  /**
-  * @todo réaliser un beanup à l'aide d'un contrat + map (des propriétés), de façon que l'on puisse initialiser un bean
-  * par des propriétés. On peut imaginer renvoyer ce map par un accesseur.
-  */
-  protected BeanUp(Class contract) throws IntrospectionException
+  private BeanUp(Class contract) throws IntrospectionException
   {
     m_values = new HashMap();
     m_contract = contract;
     am_properties =
             Introspector.getBeanInfo(contract).getPropertyDescriptors();
   }
-  
+
+  /**
+   * To get an object of a class, usually an interface.
+   *
+   */
   public static Object getInstance(Class ofThis)
   {
     Object o;
@@ -63,14 +76,10 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
     o = null;
     try
     {
-      Class[] a_c;
+      BeanUp bean;
       
-      a_c = new Class[1];
-      a_c[0] = ofThis;
-      o = Proxy.newProxyInstance(
-              BeanUp.class.getClassLoader(), 
-              a_c, 
-              new BeanUp(ofThis));
+      bean = new BeanUp(ofThis);
+      o = getInstance(bean);
     }
     catch (IntrospectionException ie)
     {
@@ -80,6 +89,54 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
       uoe.initCause(ie);
       throw uoe;
     }
+    return o;
+  }
+  
+  /**
+   * To get an object of a contract, initialised.
+   *
+   * @param ofThis Usually an interface
+   * @param values The initialised values. BeanUp uses a copy of this Map, not
+   * this map directly. To get the map internaly used, use the Mapable 
+   * interface.
+   *
+   * @return an object which automatically implements the contract.
+   *
+   */
+  public static Object getInstance(Class ofThis, Map values)
+  {
+    Object o;
+    
+    o = null;
+    try
+    {
+      BeanUp bean;
+      
+      bean = new BeanUp(ofThis);
+      bean.m_values.putAll(values);
+      o = getInstance(bean);
+    }
+    catch (IntrospectionException ie)
+    {
+      UnsupportedOperationException uoe;
+      
+      uoe = new UnsupportedOperationException(ie.toString());
+      uoe.initCause(ie);
+      throw uoe;
+    }
+    return o;
+  }
+  
+  private static Object getInstance(BeanUp forThisBean)
+  {
+    Object o;
+    
+    Class[] a_c;
+    
+    a_c = new Class[1];
+    a_c[0] = forThisBean.m_contract;
+    o = Proxy.newProxyInstance(
+            BeanUp.class.getClassLoader(), a_c, forThisBean);
     return o;
   }
   
@@ -164,10 +221,6 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
     if (!result.isDone())
       throw new NoSuchMethodException(method.getName());
     }
-//    catch (InvocationTargetException ite)
-//    {
-//      throw ite.getTargetException();
-//    }
     finally
     {
       
@@ -215,11 +268,14 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
   
   private void doSpecialMethods(Method method, Object[] args, Result cr)
   {
-    if (method.getName().equals("toString"))
+    String methodname;
+    
+    methodname = method.getName();
+    if (methodname.equals("toString"))
     {
       cr.met("<proxy "+m_contract.getName()+">");
     }
-    else if (method.getName().equals("equals"))
+    else if (methodname.equals("equals"))
     {
       if (args.length == 1)
       {
@@ -243,6 +299,8 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
         }
       }
     }
+    else if (methodname.equals("getMap"))
+      cr.met(m_values);
   }
   
   private class Result

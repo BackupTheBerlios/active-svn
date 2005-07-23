@@ -20,7 +20,7 @@ package com.diaam.active.runs;
  */
 public class Memo
 {  
-  protected StringBuffer m_buffer;
+  private StringBuffer m_buffer;
   
   public Memo()
   {
@@ -74,5 +74,5 @@ public class Memo
     s = m_buffer.toString();
     m_buffer.setLength(0);
     return s;
-  }  
+  }
 }

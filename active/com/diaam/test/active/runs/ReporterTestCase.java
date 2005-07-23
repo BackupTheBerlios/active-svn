@@ -27,7 +27,7 @@ public class ReporterTestCase extends junit.framework.TestCase
     Reporter report;
     Leaf leaf;
     String resul;
-    
+
     report = new Reporter(this);
     resul = report.say("toto", "val toto").say("tata", "val tata").fini();
     Assert.assertEquals("toto=val toto, tata=val tata, ", resul);

@@ -1,6 +1,4 @@
 /*
- * Main.java
- * * Ce n'est pas Main en anglais, c'est Main en français !
  *
  * $Log: Leaf.java,v $
  * Revision 1.3  2005/06/14 18:15:16  herve
@@ -24,20 +22,22 @@ import org.apache.log4j.Logger;
  * <a href="mailto:herve.agnoux@diaam-informatique.com">Hervé Agnoux</a>
  *
  */
-public class Leaf extends Memo
+public class Leaf
 {
   protected Logger m_log;
+  protected Memo m_memo;
   
   protected Leaf(Class pourElle)
   {
     m_log = Logger.getLogger(pourElle);
+    m_memo = new Memo();
   } 
   
   public Leaf intro(String ceci)
   {
-    addExpression(ceci);
+    m_memo.addExpression(ceci);
     return this;
-  }  
+  }
   
   /** @deprecated in inglish please ! */
   public Leaf dit(String ressource, Object valeur)
@@ -47,7 +47,7 @@ public class Leaf extends Memo
   
   public Leaf say(String ressource, Object valeur)
   {
-    add(ressource, valeur);
+    m_memo.add(ressource, valeur);
     return this;
   }  
 
@@ -59,7 +59,7 @@ public class Leaf extends Memo
   
   public Leaf say(String ressource, int valeur)
   {
-    add(ressource, valeur);
+    m_memo.add(ressource, valeur);
     return this;
   }
   
@@ -71,32 +71,38 @@ public class Leaf extends Memo
   
   public Leaf say(String ressource, boolean valeur)
   {
-    add(ressource, valeur);
+    m_memo.add(ressource, valeur);
     return this;
   }
   
   public void warn()
   {
-    m_log.warn(m_buffer.toString());
-    m_buffer.setLength(0);    
+    m_log.warn(fini());
   }
   
   public void warn(Throwable bing)
   {
-    m_log.warn(m_buffer.toString(), bing);
-    m_buffer.setLength(0);    
+    m_log.warn(fini(), bing);
+  }
+  
+  public void error()
+  {
+    m_log.warn(fini());
+  }
+  
+  public void error(Throwable bing)
+  {
+    m_log.warn(fini(), bing);
   }
   
   public void debug()
   {
-    m_log.debug(m_buffer.toString());
-    m_buffer.setLength(0);
+    m_log.debug(fini());
   }  
   
   public void info()
   {
-    m_log.info(m_buffer.toString());
-    m_buffer.setLength(0);
+    m_log.info(fini());
   }
 
   public boolean isDebugEnabled()
@@ -107,5 +113,10 @@ public class Leaf extends Memo
   public void outln()
   {
     System.out.println(fini());
+  }
+  
+  public String fini()
+  {
+    return m_memo.fini();
   }
 }
