@@ -16,9 +16,10 @@ import com.diaam.active.runs.Sure;
 import junit.framework.Assert;
 
 /**
+ * Self comprehensible class, I hope.
  *
  * @author
- * <a href="mailto:herve.agnoux@diaam-informatique.com">Hervé Agnoux</a>
+ * <a href="mailto:herve.agnoux@diaam-informatique.com">HervÃ© Agnoux</a>
  *
  */
 public class SureTestCase extends junit.framework.TestCase
@@ -37,7 +38,7 @@ public class SureTestCase extends junit.framework.TestCase
 
     try {nosure = new Sure("bla bla"); Assert.fail();} 
     catch (Sure.NotSureException ok) {}
-    try {nosure = new Sure("blaébla"); Assert.fail();} 
+    try {nosure = new Sure("blaÃ©bla"); Assert.fail();} 
     catch (Sure.NotSureException ok) {}
   }
 }

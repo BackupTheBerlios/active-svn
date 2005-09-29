@@ -5,7 +5,7 @@
  *
  * $Log: BeanUp.java,v $
  * Revision 1.3  2005/07/19 07:04:45  herve
- * Commit pour passage à SVN.
+ * Commit pour passage ï¿½ SVN.
  *
  * Revision 1.2  2005/06/14 18:15:15  herve
  * Meilleure organisation des logs
@@ -22,6 +22,7 @@
 package com.diaam.active.patterns.beans;
 
 
+import com.diaam.active.runs.Rule;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -35,11 +36,33 @@ import java.util.Map;
 
 
 /**
+ * <p>A bean which implements an interface at run-time. With that it's possible
+ * to change the contract of an interface from version to version, without
+ * to be afraid by the old implementation : the implementation is dynamic,
+ * and automaticaly follow the accessors presented in the interface.</p>
+ *<p>Exemple of use...<br>
+ * First an interface :<br>
+ * <code><pre>
+ * public interface Saleable
+ * {
+ *  public void setPrice(int price);
+ *  public int getPrice();
+ * }
+ * </pre></code>
+ * Without <i>BeanUp</i> you must implements this interface. And that's the
+ * miracle ! With <i>BeanUp</i>, you only <i>should</i> implement it. You 
+ * can do, in a method :
+ * <code><pre>
+ *  Saleable bestOffer = BeanUp.getInstance(Saleable.class);
+ *  bestOffer.setPrice(9999999999999);
+ * </pre></code>
+ * ... and <i>bestOffer.getPrice()</i> will give you 9999999999999.
+ *</p>
  *
  * @author 
- * <a href="mailto:herve.agnoux@diaam-informatique.com">Hervé Agnoux</a>
+ * <a href="mailto:herve.agnoux@diaam-informatique.com">HervÃ© Agnoux</a>
  */
-public class BeanUp implements java.lang.reflect.InvocationHandler
+public final class BeanUp implements java.lang.reflect.InvocationHandler
 {
   /**
    * A class which the properties can be seen by a Map. It's the case of the
@@ -149,77 +172,44 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
     result = new Result();
     try
     {
-    methname = method.getName();
-    doSpecialMethods(method, args, result);
-    if (!result.isDone())
-      if (methname.startsWith("set")  ||  methname.startsWith("get"))
-      {
-      String propname;
-      
-      propname = methname.substring(3);
+      methname = method.getName();
+      doSpecialMethods(method, args, result);
       if (!result.isDone())
       {
-        if (estLecture(method))
+        RuleAccessors rule;
+        
+        rule = new RuleAccessors();
+        rule.autoEvaluate(method);
+        if (rule.isOK())
         {
-          Object o;
-          
-          o = m_values.get(propname);
-          if (o instanceof Table)
+          if (rule.isGet())
           {
-            Table t;
-            Object[] a_src, a_dest;
+            Object o;
             
-            t = (Table)o;
-            a_src = t.am_vals;
-            a_dest = (Object[])Array.newInstance
-                    (method.getReturnType().getComponentType(), a_src.length);
-            System.arraycopy(a_src, 0, a_dest, 0, a_dest.length);
-            o = a_dest;
-          }
-          result.met(o);
-        }
-        else if (estEcriture(method))
-        {
-          m_values.put(propname, args[0]);
-          result.done();
-        }
-      }
-      if (!result.isDone())
-      {
-        if ((args.length >= 1)  &&  (args[0] instanceof Integer))
-        {
-          if (methname.startsWith("set"))
-          {
-            if (args.length > 1)
+            o = m_values.get(rule.getProperty());
+            if (o instanceof Table)
             {
-              int tailleListe;
-              Integer i;
               Table t;
+              Object[] a_src, a_dest;
               
-              t = (Table)m_values.get(propname);
-              i = (Integer)args[0];
-              tailleListe = i.intValue() + 1;
-              if (t == null)
-                t = new Table(tailleListe);
-              t.met(i.intValue(), args[1]);
-              m_values.put(propname, t);
-              result.done();
+              t = (Table)o;
+              a_src = t.am_vals;
+              a_dest = (Object[])Array.newInstance
+                      (method.getReturnType().getComponentType(), a_src.length);
+              System.arraycopy(a_src, 0, a_dest, 0, a_dest.length);
+              o = a_dest;
             }
+            result.met(o);
           }
-          else if (methname.startsWith("get"))
+          else if (rule.isSet())
           {
-            Table a_liste;
-            Integer i;
-            
-            i = (Integer)args[0];
-            a_liste = (Table)m_values.get(propname);
-            result.met(a_liste.am_vals[i.intValue()]);
+            m_values.put(rule.getProperty(), args[0]);
+            result.done();
           }
         }
       }
-      }
-    if (!result.isDone())
-      throw new NoSuchMethodException(method.getName());
+      if (!result.isDone())
+        throw new NoSuchMethodException(method.getName());
     }
     finally
     {
@@ -228,43 +218,43 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
     return result.m_value;
   }
   
-  private boolean estLecture(Method elle)
-  {
-    boolean b;
-    
-    b = false;
-    for (int i = 0; i < am_properties.length; i++)
-    {
-      Method m;
-      
-      m = am_properties[i].getReadMethod();
-      if ((m != null)  &&  m.equals(elle))
-      {
-        b = true;
-        break;
-      }
-    }
-    return b;
-  }
-  
-  private boolean estEcriture(Method elle)
-  {
-    boolean b;
-    
-    b = false;
-    for (int i = 0; i < am_properties.length; i++)
-    {
-      Method m;
-      
-      m = am_properties[i].getWriteMethod();
-      if ((m != null)  &&  m.equals(elle))
-      {
-        b = true;
-        break;
-      }
-    }
-    return b;
-  }
+//  private boolean estLecture(Method elle)
+//  {
+//    boolean b;
+//    
+//    b = false;
+//    for (int i = 0; i < am_properties.length; i++)
+//    {
+//      Method m;
+//      
+//      m = am_properties[i].getReadMethod();
+//      if ((m != null)  &&  m.equals(elle))
+//      {
+//        b = true;
+//        break;
+//      }
+//    }
+//    return b;
+//  }
+//  
+//  private boolean estEcriture(Method elle)
+//  {
+//    boolean b;
+//    
+//    b = false;
+//    for (int i = 0; i < am_properties.length; i++)
+//    {
+//      Method m;
+//      
+//      m = am_properties[i].getWriteMethod();
+//      if ((m != null)  &&  m.equals(elle))
+//      {
+//        b = true;
+//        break;
+//      }
+//    }
+//    return b;
+//  }
   
   private void doSpecialMethods(Method method, Object[] args, Result cr)
   {
@@ -382,6 +372,43 @@ public class BeanUp implements java.lang.reflect.InvocationHandler
         }
       }
       return resultat;
+    }
+  }
+  
+  private static class RuleAccessors extends com.diaam.active.runs.Rule
+  {
+    private String m_xet = "";
+    private String m_property = "";
+    
+    private RuleAccessors match(Method perhapsAccessor)
+    {
+      RuleAccessors ok;
+      String name;
+      
+      ok = null;
+      name = perhapsAccessor.getName();
+      if (name.startsWith("set")  ||  name.startsWith("get"))
+      {
+        ok = this;
+        m_xet = perhapsAccessor.getName().substring(0, 3);
+        m_property = name.substring(3);
+      }
+      return ok;
+    }
+    
+    public boolean isGet()
+    {
+      return "get".equals(m_xet);
+    }
+    
+    public boolean isSet()
+    {
+      return "set".equals(m_xet);
+    }
+    
+    public String getProperty()
+    {
+      return m_property;
     }
   }
 }

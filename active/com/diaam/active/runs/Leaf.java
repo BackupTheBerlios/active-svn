@@ -18,8 +18,10 @@ package com.diaam.active.runs;
 import org.apache.log4j.Logger;
 
 /**
+ * A logger for an object with a short cycle of life.
+ *
  * @author 
- * <a href="mailto:herve.agnoux@diaam-informatique.com">Hervé Agnoux</a>
+ * <a href="mailto:herve.agnoux@diaam-informatique.com">HervÃ© Agnoux</a>
  *
  */
 public class Leaf

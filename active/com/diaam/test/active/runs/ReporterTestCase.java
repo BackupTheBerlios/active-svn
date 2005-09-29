@@ -17,6 +17,7 @@ import com.diaam.active.runs.Reporter;
 import junit.framework.Assert;
 
 /**
+ * Self comprehensible class, I hope.
  *
  * @author herve
  */

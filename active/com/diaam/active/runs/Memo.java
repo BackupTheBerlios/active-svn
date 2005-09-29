@@ -5,7 +5,7 @@
  *
  * $Log: Memo.java,v $
  * Revision 1.1  2005/07/19 07:04:45  herve
- * Commit pour passage à SVN.
+ * Commit pour passage Ã  SVN.
  *
  *
  */
@@ -13,9 +13,10 @@
 package com.diaam.active.runs;
 
 /**
+ * A sort of string to keep the logs messages.
  *
  * @author
- * <a href="mailto:herve.agnoux@diaam-informatique.com">Hervé Agnoux</a>
+ * <a href="mailto:herve.agnoux@diaam-informatique.com">HervÃ© Agnoux</a>
  *
  */
 public class Memo
@@ -65,9 +66,23 @@ public class Memo
   }
   
   /**
-   * Délivre le message accumulé et vide le conteneur.
+   * DÃ©livre le message accumulÃ© et vide le conteneur.
+   *
+   * @deprecated it's in french ! see end.
    */
   public String fini()
+  {
+    String s;
+    
+    s = m_buffer.toString();
+    m_buffer.setLength(0);
+    return s;
+  }
+  
+  /**
+   * Give message and clean contener.
+   */
+  public String end()
   {
     String s;
     

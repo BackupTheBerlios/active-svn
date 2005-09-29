@@ -18,12 +18,11 @@ package com.diaam.active.runs;
 import java.util.regex.Pattern;
 
 /**
- * Un identificateur robuste. Souvent il est nécessaire de disposer
- * d'identificateurs qui ne comportent pas d'espace, pas d'accents, ou
- * d'autres caractères hésotériques.
+ * A robust identificator. it's often useful to dispose of identificators
+ * without spaces, accents, and so on.
  *
  * @author 
- * <a href="mailto:herve.agnoux@diaam-informatique.com">Hervé Agnoux</a>
+ * <a href="mailto:herve.agnoux@diaam-informatique.com">HervÃ© Agnoux</a>
  *
  */
 public class Sure
@@ -32,7 +31,6 @@ public class Sure
   
   private String m_tag;
   
-  /** Creates a new instance of Sure */
   public Sure(String tag)
   {
     if (!m_patternSure.matcher(tag).matches())
@@ -45,6 +43,9 @@ public class Sure
     return m_tag;
   }
   
+  /**
+   * When sure is not sure...
+   */
   public static class NotSureException extends java.lang.RuntimeException
   {
     private NotSureException(String noSure)
