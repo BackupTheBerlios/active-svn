@@ -15,6 +15,7 @@
 
 package com.diaam.active.runs;
 
+import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 /**
@@ -28,11 +29,15 @@ public class Leaf
 {
   protected Logger m_log;
   protected Memo m_memo;
+  protected HashMap m_logs;
   
+  /** 
+   */
   protected Leaf(Class pourElle)
   {
     m_log = Logger.getLogger(pourElle);
     m_memo = new Memo();
+    m_logs = new HashMap();
   } 
   
   public Leaf intro(String ceci)
@@ -89,12 +94,12 @@ public class Leaf
   
   public void error()
   {
-    m_log.warn(fini());
+    m_log.error(fini());
   }
   
   public void error(Throwable bing)
   {
-    m_log.warn(fini(), bing);
+    m_log.error(fini(), bing);
   }
   
   public void debug()
@@ -117,8 +122,27 @@ public class Leaf
     System.out.println(fini());
   }
   
+  /** @deprecated in inglish please ! */
   public String fini()
   {
-    return m_memo.fini();
+    return m_memo.end();
+  }
+  
+  public String end()
+  {
+    return m_memo.end();
+  }
+  
+  public Leaf get(Class pourLui)
+  {
+    Leaf m;
+    
+    m = (Leaf)m_logs.get(pourLui);
+    if (m == null)
+    {
+      m = new Leaf(pourLui);
+      m_logs.put(pourLui, m);
+    }
+    return m;
   }
 }

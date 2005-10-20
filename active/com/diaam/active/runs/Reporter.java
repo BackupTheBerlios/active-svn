@@ -35,13 +35,11 @@ public final class Reporter extends Leaf
   private static ArrayList m_allReporters = new ArrayList();
   
   private Object m_object;
-  private HashMap m_logs;
   
   public Reporter(Object pourLui)
   {
     super(pourLui.getClass());
     m_object = pourLui;
-    m_logs = new HashMap();
     synchronized (m_allReporters)
     {
       m_allReporters.add(new WeakReference(this));
@@ -58,19 +56,6 @@ public final class Reporter extends Leaf
     return "{"+m_object+"}."+explications;
   }
   
-  public Leaf get(Class pourLui)
-  {
-    Leaf m;
-    
-    m = (Leaf)m_logs.get(pourLui);
-    if (m == null)
-    {
-      m = new Leaf(pourLui);
-      m_logs.put(pourLui, m);
-    }
-    return m;
-  }
-
   /**
    * If this reporter is no longuer in use. The reporters use a WeakReference
    * to conserve the list of reporters, so this method is not strictly 
@@ -99,7 +84,7 @@ public final class Reporter extends Leaf
     }
   }
   
-  public Collection reporters()
+  public Reporter[] reporters()
   {
     ArrayList list;
     
@@ -120,7 +105,7 @@ public final class Reporter extends Leaf
         else
           list.add(obj);
       }
-      return list;
+      return (Reporter[])list.toArray(new Reporter[list.size()]);
     }
   }
   

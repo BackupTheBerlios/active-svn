@@ -22,6 +22,7 @@
 package com.diaam.active.patterns.beans;
 
 
+import com.diaam.active.runs.Memo;
 import com.diaam.active.runs.Rule;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -168,7 +169,7 @@ public final class BeanUp implements java.lang.reflect.InvocationHandler
   {
     String methname;
     Result result;
-    
+
     result = new Result();
     try
     {
@@ -185,8 +186,10 @@ public final class BeanUp implements java.lang.reflect.InvocationHandler
           if (rule.isGet())
           {
             Object o;
+            Class returntype;
             
             o = m_values.get(rule.getProperty());
+            returntype = method.getReturnType();
             if (o instanceof Table)
             {
               Table t;
@@ -195,11 +198,22 @@ public final class BeanUp implements java.lang.reflect.InvocationHandler
               t = (Table)o;
               a_src = t.am_vals;
               a_dest = (Object[])Array.newInstance
-                      (method.getReturnType().getComponentType(), a_src.length);
+                      (returntype.getComponentType(), a_src.length);
               System.arraycopy(a_src, 0, a_dest, 0, a_dest.length);
               o = a_dest;
             }
             result.met(o);
+            if (!returntype.isAssignableFrom(result.m_value.getClass()))
+            {
+              Memo memo;
+              
+              memo = new Memo();
+              memo.
+                      add("method", method).
+                      add("class wait", returntype).
+                      add("class get", result.m_value.getClass());
+              throw new ClassCastException(memo.fini());
+            }
           }
           else if (rule.isSet())
           {
@@ -217,45 +231,10 @@ public final class BeanUp implements java.lang.reflect.InvocationHandler
     }
     return result.m_value;
   }
-  
-//  private boolean estLecture(Method elle)
-//  {
-//    boolean b;
-//    
-//    b = false;
-//    for (int i = 0; i < am_properties.length; i++)
-//    {
-//      Method m;
-//      
-//      m = am_properties[i].getReadMethod();
-//      if ((m != null)  &&  m.equals(elle))
-//      {
-//        b = true;
-//        break;
-//      }
-//    }
-//    return b;
-//  }
-//  
-//  private boolean estEcriture(Method elle)
-//  {
-//    boolean b;
-//    
-//    b = false;
-//    for (int i = 0; i < am_properties.length; i++)
-//    {
-//      Method m;
-//      
-//      m = am_properties[i].getWriteMethod();
-//      if ((m != null)  &&  m.equals(elle))
-//      {
-//        b = true;
-//        break;
-//      }
-//    }
-//    return b;
-//  }
-  
+    
+  /**
+   * @todo Sur toString, afficher aussi le contenu du map.
+   */
   private void doSpecialMethods(Method method, Object[] args, Result cr)
   {
     String methodname;
@@ -289,7 +268,8 @@ public final class BeanUp implements java.lang.reflect.InvocationHandler
         }
       }
     }
-    else if (methodname.equals("getMap"))
+    // for Mapable interface, not very generic...
+    else if (methodname.equals("getValues"))
       cr.met(m_values);
   }
   
@@ -375,12 +355,17 @@ public final class BeanUp implements java.lang.reflect.InvocationHandler
     }
   }
   
-  private static class RuleAccessors extends com.diaam.active.runs.Rule
+  public static class RuleAccessors extends com.diaam.active.runs.Rule
   {
     private String m_xet = "";
     private String m_property = "";
     
-    private RuleAccessors match(Method perhapsAccessor)
+    public RuleAccessors match(Object perhapsAccessor)
+    {
+      return match((Method)perhapsAccessor);
+    }
+    
+    public RuleAccessors match(Method perhapsAccessor)
     {
       RuleAccessors ok;
       String name;
@@ -391,7 +376,7 @@ public final class BeanUp implements java.lang.reflect.InvocationHandler
       {
         ok = this;
         m_xet = perhapsAccessor.getName().substring(0, 3);
-        m_property = name.substring(3);
+        m_property = Introspector.decapitalize(name.substring(3));
       }
       return ok;
     }
